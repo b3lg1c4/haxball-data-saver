@@ -2,11 +2,10 @@ const express = require('express');
 const server = express();
 const { WebSocketServer } = require('ws');
 const cors = require('cors');
-const dotenv = require('dotenv');
 const fs = require('fs');
 const path = require('path');
 
-dotenv.config();
+
 server.use(cors());
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
