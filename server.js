@@ -1,38 +1,44 @@
 const express = require('express');
 const server = express();
-const {WebSocketServer} = require('ws');
+const { WebSocketServer } = require('ws');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const fs = require('fs');
+const path = require('path');
 
 dotenv.config();
 server.use(cors());
 server.use(express.json());
-server.use(express.urlencoded({extended:true}));
-
-console.log(process.env);
-
-const wss = new WebSocketServer({ port: 7072 });
-let connection;
-
-wss.on("connection",(conn) => {
-    connection = conn;
-});
+server.use(express.urlencoded({ extended: true }));
 
 
-server.use((req,res,next) => {
-    if(connection) return next();
-    res.status(500).send({error:"Socket connection on port 7072 not established"});
-});
+const WEB_SOCKET_PORT = 7072;
+const HTTP_SERVER_PORT = 7073;
 
-server.get("/top25", async (req,res) => {
+const socket = new WebSocketServer({ port: WEB_SOCKET_PORT });
 
-    await connection.send("registrofutsal");
-    await connection.on("message", (msg) => {
-        res.send(msg.toString());
+socket.on("connection", (conn) => {
+
+    conn.on("message", async (msg) => {
+
+        const registrofutsal = msg.toString();
+
+        await fs.writeFile("registrofutsal.json", registrofutsal, (err) => {
+            if (err) throw err;
+        });
+
+
     });
+
 });
 
-server.listen(process.env.PORT || 80, (req,res) => {
+
+server.get("/top25", async (req, res) => {
+
+    res.sendFile(path.join(__dirname,"registrofutsal.json"));
+});
+
+server.listen(HTTP_SERVER_PORT, (req, res) => {
     console.clear();
     console.log("haxball-data-saver 1.0.0");
 });
