@@ -32,7 +32,7 @@ socket.on("connection", (conn) => {
 });
 
 server.get("/", async (req,res) => {
-    res.redirect("localhost:3000/top25");
+    res.redirect(`localhost:${HTTP_SERVER_SOCKET}/top25`);
 });
 
 server.get("/top25", async (req, res) => {
